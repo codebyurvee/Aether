@@ -1,0 +1,167 @@
+========================================
+AETHER - AI ENGINEER LIFE OS
+========================================
+
+✅ INSTALLATION COMPLETE!
+
+📋 WHAT YOU NEED BEFORE RUNNING:
+
+1. MongoDB Running:
+   - Install MongoDB from: https://www.mongodb.com/try/download/community
+   - Start MongoDB service
+   - OR use MongoDB Atlas (cloud): https://www.mongodb.com/cloud/atlas
+
+2. Firebase Project (for Google Sign-In):
+   - Go to: https://console.firebase.google.com
+   - Create a new project
+   - Enable Authentication > Email/Password & Google
+   - Get your config from Project Settings
+   - Update frontend/.env with your Firebase credentials
+
+========================================
+🚀 HOW TO RUN:
+========================================
+
+OPTION 1 - Using Scripts (Easiest):
+   1. Double-click: start-backend.bat
+   2. Double-click: start-frontend.bat
+   3. Open browser: http://localhost:5173
+
+OPTION 2 - Manual:
+   Terminal 1 (Backend):
+   cd backend
+   npm run dev
+
+   Terminal 2 (Frontend):
+   cd frontend
+   npm run dev
+
+========================================
+⚙️ CONFIGURATION:
+========================================
+
+Backend (.env file already created):
+   - MongoDB: mongodb://localhost:27017/aether
+   - Port: 5000
+   - Update FIREBASE_PROJECT_ID if needed
+
+Frontend (.env file created - NEEDS YOUR FIREBASE CONFIG):
+   - Open: frontend/.env
+   - Replace "your_firebase_*" with actual values from Firebase Console
+
+========================================
+🔥 FIREBASE SETUP (5 minutes):
+========================================
+
+1. Go to: https://console.firebase.google.com
+2. Click "Add project" → Name it "Aether"
+3. Go to Authentication → Get Started
+4. Enable "Email/Password" sign-in method
+5. Enable "Google" sign-in method
+6. Go to Project Settings (gear icon)
+7. Scroll to "Your apps" → Click Web icon (</>)
+8. Copy the config values
+9. Paste into frontend/.env file
+
+Example Firebase config:
+   apiKey: "AIzaSyC..."
+   authDomain: "aether-12345.firebaseapp.com"
+   projectId: "aether-12345"
+   etc.
+
+========================================
+🗄️ MONGODB SETUP:
+========================================
+
+OPTION A - Local MongoDB:
+   1. Download: https://www.mongodb.com/try/download/community
+   2. Install and start MongoDB service
+   3. Backend will connect automatically
+
+OPTION B - MongoDB Atlas (Cloud - Free):
+   1. Go to: https://www.mongodb.com/cloud/atlas
+   2. Create free account and cluster
+   3. Get connection string
+   4. Update backend/.env:
+      MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/aether
+
+========================================
+✅ VERIFY IT'S WORKING:
+========================================
+
+1. Backend Running:
+   - Open: http://localhost:5000/api/health
+   - Should see: {"status":"ok","message":"Aether API is running"}
+
+2. Frontend Running:
+   - Open: http://localhost:5173
+   - Should see: Beautiful login page
+
+3. Create Account:
+   - Click "Sign up"
+   - Register with email/password or Google
+
+4. Initialize Data:
+   - After login, go to "Life Phases" → Click "Initialize Phases"
+   - Go to "Skills" → Click "Initialize Skills"
+
+========================================
+🎯 FIRST STEPS AFTER LOGIN:
+========================================
+
+1. Dashboard - See your overview
+2. Life Phases - Initialize 3 learning phases
+3. Skills - Initialize 16 AI Engineer skills
+4. Projects - Add your first AI/ML project
+5. Deep Work - Try the Pomodoro timer
+6. Career - Track job applications
+7. Research - Save ideas and papers
+8. Brand - Connect GitHub/LinkedIn
+9. Analytics - View progress charts
+
+========================================
+🐛 TROUBLESHOOTING:
+========================================
+
+Backend won't start:
+   ❌ MongoDB not running
+   ✅ Start MongoDB service
+
+Frontend won't start:
+   ❌ Port 5173 already in use
+   ✅ Close other Vite apps or change port
+
+Can't login:
+   ❌ Firebase not configured
+   ✅ Update frontend/.env with real Firebase credentials
+
+Database error:
+   ❌ MongoDB connection failed
+   ✅ Check MongoDB is running or Atlas connection string
+
+========================================
+📁 PROJECT STRUCTURE:
+========================================
+
+aether/
+├── backend/          → Node.js API (Port 5000)
+├── frontend/         → React App (Port 5173)
+├── start-backend.bat → Run backend
+├── start-frontend.bat → Run frontend
+└── INSTRUCTIONS.txt  → This file
+
+========================================
+🎉 YOU'RE READY!
+========================================
+
+1. Configure Firebase (frontend/.env)
+2. Start MongoDB
+3. Run start-backend.bat
+4. Run start-frontend.bat
+5. Open http://localhost:5173
+6. Create account and start tracking!
+
+Need help? Check the error messages in the terminal windows.
+
+Happy coding! 🚀
+Build amazing AI projects and track your journey!
