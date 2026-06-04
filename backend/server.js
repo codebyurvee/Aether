@@ -14,6 +14,7 @@ import careerRoutes from './routes/career.routes.js';
 import researchRoutes from './routes/research.routes.js';
 import brandRoutes from './routes/brand.routes.js';
 import analyticsRoutes from './routes/analytics.routes.js';
+import aiRoutes from './routes/ai.routes.js';
 
 dotenv.config();
 
@@ -59,6 +60,7 @@ app.use('/api/career', careerRoutes);
 app.use('/api/research', researchRoutes);
 app.use('/api/brand', brandRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Health check
 app.get('/', (req, res) => {

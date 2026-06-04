@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Search, Lightbulb, X, Edit2, Trash2, Star } from 'lucide-react'
+import { Plus, Search, Lightbulb, X, Edit2, Trash2, Star, Sparkles } from 'lucide-react'
 import api from '../lib/axios'
+import { aiAPI } from '../lib/ai'
+import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
 const Research = () => {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const [typeFilter, setTypeFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
@@ -133,13 +136,22 @@ const Research = () => {
           <h1 className="text-3xl font-bold mb-2">Research & Ideas</h1>
           <p className="text-gray-400">Your vault of ideas and experiments</p>
         </div>
-        <button 
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark rounded-lg transition-colors"
-        >
-          <Plus size={20} />
-          New Entry
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate('/ai')}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-accent-purple to-accent-pink hover:opacity-90 rounded-lg transition-opacity"
+          >
+            <Sparkles size={18} />
+            AI Summarize
+          </button>
+          <button 
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark rounded-lg transition-colors"
+          >
+            <Plus size={20} />
+            New Entry
+          </button>
+        </div>
       </div>
 
       {/* Filters */}

@@ -13,7 +13,8 @@ import {
   TrendingUp,
   Settings,
   Menu,
-  X
+  X,
+  Bot
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import { useLocalStorage } from '../hooks/useLocalStorage'
@@ -29,6 +30,7 @@ const navItems = [
   { to: '/research', icon: Lightbulb, label: 'Research' },
   { to: '/brand', icon: Sparkles, label: 'Brand' },
   { to: '/analytics', icon: TrendingUp, label: 'Analytics' },
+  { to: '/ai', icon: Bot, label: 'Aria AI ✨' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ]
 

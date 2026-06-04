@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Search, LayoutGrid, List, X, Edit2, Trash2, CheckCircle2, Circle, ChevronDown, ChevronUp } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import api from '../lib/axios'
 import toast from 'react-hot-toast'
 
 const Projects = () => {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const [view, setView] = useState('grid')
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -182,13 +184,24 @@ const Projects = () => {
           <h1 className="text-3xl font-bold mb-2">Projects</h1>
           <p className="text-gray-400">Track your AI/ML projects and experiments</p>
         </div>
-        <button 
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark rounded-lg transition-colors"
-        >
-          <Plus size={20} />
-          New Project
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate('/ai')}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-accent-cyan to-primary hover:opacity-90 rounded-lg transition-opacity"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+            AI Ideas
+          </button>
+          <button 
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark rounded-lg transition-colors"
+          >
+            <Plus size={20} />
+            New Project
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
