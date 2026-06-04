@@ -25,22 +25,27 @@ connectDB();
 
 // Security middleware
 app.use(helmet());
+
+// CORS - allow all origins in production (Vercel)
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL 
-    : 'http://localhost:5173',
-  credentials: true
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: false
 }));
+
+// Handle preflight
+app.options('*', cors());
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 200
 });
 app.use('/api/', limiter);
 
 // Body parser
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
@@ -56,8 +61,12 @@ app.use('/api/brand', brandRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
 // Health check
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', message: 'Aether API is running 🚀' });
+});
+
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Aether API is running' });
+  res.json({ status: 'ok', message: 'Aether API is running 🚀' });
 });
 
 // Error handling middleware
@@ -65,8 +74,7 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({
     success: false,
-    message: err.message || 'Internal Server Error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    message: err.message || 'Internal Server Error'
   });
 });
 

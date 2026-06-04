@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Search, LayoutGrid, List, X, Edit2, Trash2 } from 'lucide-react'
+import { Plus, Search, LayoutGrid, List, X, Edit2, Trash2, CheckCircle2, Circle, ChevronDown, ChevronUp } from 'lucide-react'
 import api from '../lib/axios'
 import toast from 'react-hot-toast'
 
@@ -12,7 +12,10 @@ const Projects = () => {
   const [statusFilter, setStatusFilter] = useState('all')
   const [showModal, setShowModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showSubtaskModal, setShowSubtaskModal] = useState(false)
+  const [expandedProject, setExpandedProject] = useState(null)
   const [selectedProject, setSelectedProject] = useState(null)
+  const [newSubtask, setNewSubtask] = useState('')
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -115,6 +118,39 @@ const Projects = () => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       deleteMutation.mutate(id)
     }
+  }
+
+  const addSubtaskMutation = useMutation({
+    mutationFn: ({ projectId, title }) => api.post(`/projects/${projectId}/subtasks`, { title }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['projects'])
+      setNewSubtask('')
+      toast.success('Subtask added!')
+    },
+    onError: () => toast.error('Failed to add subtask')
+  })
+
+  const toggleSubtaskMutation = useMutation({
+    mutationFn: ({ projectId, subtaskId, completed }) =>
+      api.put(`/projects/${projectId}/subtasks/${subtaskId}`, { completed }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['projects'])
+    },
+    onError: () => toast.error('Failed to update subtask')
+  })
+
+  const deleteSubtaskMutation = useMutation({
+    mutationFn: ({ projectId, subtaskId }) =>
+      api.delete(`/projects/${projectId}/subtasks/${subtaskId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['projects'])
+      toast.success('Subtask deleted!')
+    }
+  })
+
+  const handleAddSubtask = (projectId) => {
+    if (!newSubtask.trim()) return
+    addSubtaskMutation.mutate({ projectId, title: newSubtask.trim() })
   }
 
   const statuses = [
@@ -263,7 +299,7 @@ const Projects = () => {
               </div>
 
               {project.technologies && project.technologies.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mb-3">
                   {project.technologies.slice(0, 3).map((tech, i) => (
                     <span key={i} className="px-2 py-1 bg-dark-bg text-xs rounded">
                       {tech}
@@ -276,6 +312,78 @@ const Projects = () => {
                   )}
                 </div>
               )}
+
+              {/* Subtasks Toggle */}
+              <button
+                onClick={() => setExpandedProject(expandedProject === project._id ? null : project._id)}
+                className="w-full flex items-center justify-between text-xs text-gray-400 hover:text-white pt-2 border-t border-dark-border transition-colors"
+              >
+                <span>Subtasks ({project.subtasks?.length || 0})</span>
+                {expandedProject === project._id ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
+
+              {/* Subtasks List */}
+              <AnimatePresence>
+                {expandedProject === project._id && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pt-2 space-y-1">
+                      {project.subtasks?.map((subtask) => (
+                        <div key={subtask._id} className="flex items-center gap-2 group">
+                          <button
+                            onClick={() => toggleSubtaskMutation.mutate({
+                              projectId: project._id,
+                              subtaskId: subtask._id,
+                              completed: !subtask.completed
+                            })}
+                            className="flex-shrink-0"
+                          >
+                            {subtask.completed
+                              ? <CheckCircle2 size={16} className="text-primary" />
+                              : <Circle size={16} className="text-gray-400" />
+                            }
+                          </button>
+                          <span className={`flex-1 text-xs ${subtask.completed ? 'line-through text-gray-500' : ''}`}>
+                            {subtask.title}
+                          </span>
+                          <button
+                            onClick={() => deleteSubtaskMutation.mutate({ projectId: project._id, subtaskId: subtask._id })}
+                            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-dark-hover rounded transition-all"
+                          >
+                            <Trash2 size={12} className="text-red-400" />
+                          </button>
+                        </div>
+                      ))}
+                      {/* Add Subtask */}
+                      <div className="flex gap-2 mt-2">
+                        <input
+                          type="text"
+                          placeholder="Add subtask..."
+                          value={selectedProject?._id === project._id ? newSubtask : ''}
+                          onChange={(e) => {
+                            setSelectedProject(project)
+                            setNewSubtask(e.target.value)
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleAddSubtask(project._id)
+                          }}
+                          className="flex-1 bg-dark-bg border border-dark-border rounded px-2 py-1 text-xs focus:outline-none focus:border-primary"
+                        />
+                        <button
+                          onClick={() => handleAddSubtask(project._id)}
+                          className="px-2 py-1 bg-primary rounded text-xs hover:bg-primary-dark transition-colors"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           ))}
         </div>

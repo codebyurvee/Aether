@@ -172,17 +172,33 @@ const Career = () => {
                     <span className={`px-3 py-1 rounded-full text-xs ${getStatusColor(career.status)}`}>
                       {career.status}
                     </span>
+                    <span className="px-2 py-1 bg-dark-bg text-xs rounded-full capitalize">
+                      {career.type}
+                    </span>
                   </div>
-                  <p className="text-gray-400 mb-2">{career.company}</p>
-                  {career.location && (
-                    <p className="text-sm text-gray-500">{career.location}</p>
+                  <p className="text-gray-400 mb-1 font-medium">{career.company}</p>
+                  {career.location && <p className="text-sm text-gray-500 mb-2">{career.location}</p>}
+                  {/* Interview rounds */}
+                  {career.interviews && career.interviews.length > 0 && (
+                    <div className="flex gap-2 flex-wrap mt-2">
+                      {career.interviews.map((interview, i) => (
+                        <span key={i} className={`px-2 py-1 text-xs rounded-full ${
+                          interview.status === 'passed' ? 'bg-green-500/20 text-green-400' :
+                          interview.status === 'failed' ? 'bg-red-500/20 text-red-400' :
+                          interview.status === 'completed' ? 'bg-blue-500/20 text-blue-400' :
+                          'bg-yellow-500/20 text-yellow-400'
+                        }`}>
+                          {interview.round || `Round ${i + 1}`} — {interview.status}
+                        </span>
+                      ))}
+                    </div>
                   )}
                 </div>
                 <div className="flex items-start gap-4">
                   {career.salary?.amount && (
                     <div className="text-right">
                       <p className="text-lg font-semibold">
-                        {career.salary.currency} {career.salary.amount.toLocaleString()}
+                        ₹{career.salary.amount.toLocaleString()}
                       </p>
                       <p className="text-xs text-gray-400">Expected</p>
                     </div>
@@ -437,7 +453,6 @@ const Career = () => {
           </div>
         )}
       </AnimatePresence>
-      )}
     </div>
   )
 }

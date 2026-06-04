@@ -100,15 +100,16 @@ const DeepWork = () => {
 
   const handleLogSubmit = (e) => {
     e.preventDefault()
-    createLogMutation.mutate({
+    const sessionData = {
       date: new Date(),
       type: 'daily-log',
       codingHours: parseFloat(logData.codingHours) || 0,
       researchHours: parseFloat(logData.researchHours) || 0,
       papersRead: parseInt(logData.papersRead) || 0,
-      focusSessions: sessionsCompleted,
+      focusSessions: sessionsToday,
       notes: logData.notes
-    })
+    }
+    createLogMutation.mutate(sessionData)
   }
 
   return (

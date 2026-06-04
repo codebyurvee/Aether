@@ -12,6 +12,7 @@ import Career from './pages/Career'
 import Research from './pages/Research'
 import Brand from './pages/Brand'
 import Analytics from './pages/Analytics'
+import Settings from './pages/Settings'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -56,6 +57,7 @@ function App() {
         <Route path="research" element={<Research />} />
         <Route path="brand" element={<Brand />} />
         <Route path="analytics" element={<Analytics />} />
+        <Route path="settings" element={<Settings />} />
       </Route>
 
       {/* Catch all */}

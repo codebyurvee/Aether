@@ -16,16 +16,21 @@ export const register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check if user exists
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide name, email and password'
+      });
+    }
+
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({
         success: false,
-        message: 'User already exists'
+        message: 'User already exists with this email'
       });
     }
 
-    // Create user
     const user = await User.create({
       name,
       email,
@@ -33,7 +38,6 @@ export const register = async (req, res, next) => {
       authProvider: 'email'
     });
 
-    // Generate token
     const token = generateToken(user._id);
 
     res.status(201).json({
@@ -61,7 +65,13 @@ export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    // Check for user
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email and password'
+      });
+    }
+
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return res.status(401).json({
@@ -70,7 +80,14 @@ export const login = async (req, res, next) => {
       });
     }
 
-    // Check password
+    // Google-only users have no password
+    if (!user.password) {
+      return res.status(401).json({
+        success: false,
+        message: 'This account uses Google Sign-In. Please login with Google.'
+      });
+    }
+
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({
@@ -79,7 +96,6 @@ export const login = async (req, res, next) => {
       });
     }
 
-    // Generate token
     const token = generateToken(user._id);
 
     res.json({
@@ -100,27 +116,44 @@ export const login = async (req, res, next) => {
   }
 };
 
-// @desc    Google Sign-In
+// @desc    Google Sign-In — verifies Firebase ID token on backend
 // @route   POST /api/auth/google
 // @access  Public
 export const googleAuth = async (req, res, next) => {
   try {
-    const { email, name, uid, picture } = req.body;
+    const { firebaseToken } = req.body;
 
-    // For development: Accept the user data directly from frontend
-    // In production, you should verify the Firebase token
-    if (!email || !uid) {
+    if (!firebaseToken) {
       return res.status(400).json({
         success: false,
-        message: 'Email and UID are required'
+        message: 'Firebase token is required'
       });
     }
 
-    // Check if user exists
+    // Verify the Firebase ID token properly
+    let decodedToken;
+    try {
+      decodedToken = await verifyFirebaseToken(firebaseToken);
+    } catch (err) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid Firebase token. Please sign in again.'
+      });
+    }
+
+    const { uid, email, name, picture } = decodedToken;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email not found in token'
+      });
+    }
+
+    // Find or create user
     let user = await User.findOne({ $or: [{ firebaseUid: uid }, { email }] });
 
     if (!user) {
-      // Create new user
       user = await User.create({
         name: name || email.split('@')[0],
         email,
@@ -128,15 +161,15 @@ export const googleAuth = async (req, res, next) => {
         avatar: picture || '',
         authProvider: 'google'
       });
-    } else if (!user.firebaseUid) {
-      // Update existing user with Firebase UID
-      user.firebaseUid = uid;
-      user.authProvider = 'google';
-      if (picture) user.avatar = picture;
-      await user.save();
+    } else {
+      // Update firebase uid and avatar if missing
+      let changed = false;
+      if (!user.firebaseUid) { user.firebaseUid = uid; changed = true; }
+      if (picture && !user.avatar) { user.avatar = picture; changed = true; }
+      if (user.authProvider !== 'google') { user.authProvider = 'google'; changed = true; }
+      if (changed) await user.save();
     }
 
-    // Generate JWT token
     const token = generateToken(user._id);
 
     res.json({
@@ -157,13 +190,12 @@ export const googleAuth = async (req, res, next) => {
   }
 };
 
-// @desc    Get current user
+// @desc    Get current logged in user
 // @route   GET /api/auth/me
 // @access  Private
 export const getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
-
     res.json({
       success: true,
       data: user

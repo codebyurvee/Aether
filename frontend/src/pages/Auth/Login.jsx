@@ -41,16 +41,10 @@ const Login = () => {
     setLoading(true)
     try {
       const result = await signInWithPopup(auth, googleProvider)
-      const user = result.user
-      
-      // Send user data directly to backend
-      const { data } = await api.post('/auth/google', {
-        email: user.email,
-        name: user.displayName,
-        uid: user.uid,
-        picture: user.photoURL
-      })
-      
+      // Get Firebase ID token and send to backend for verification
+      const firebaseToken = await result.user.getIdToken()
+
+      const { data } = await api.post('/auth/google', { firebaseToken })
       setAuth(data.data.user, data.data.token)
       toast.success('Welcome to Aether!')
       navigate('/dashboard')
